@@ -23,3 +23,5 @@ MongoClient.connect(
     });
   }
 );
+
+// view
