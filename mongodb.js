@@ -1,56 +1,47 @@
 // Crud Operations
-const mongodb = require("mongodb");
-const MongoClient = mongodb.MongoClient;
+const { MongoClient } = require("mongodb-legacy");
 
 const connectionURL = "mongodb://127.0.0.1:27017";
 const databaseName = "task-app";
 
-MongoClient.connect(
-  connectionURL,
-  { useNewUrlParser: true },
-  (error, client) => {
-    //
-    if (error) {
-      return console.log("Unable to connect to database!");
-    }
+async function connectToDatabase() {
+  const client = new MongoClient(connectionURL, { useNewUrlParser: true });
+
+  try {
+    // Connect to the MongoDB server
+    await client.connect();
     console.log("Connected!!!!!");
 
     const db = client.db(databaseName);
 
-    // db.collection("users").insertOne(
-    //   {
-    //     name: "Parv",
-    //     age: 18,
-    //   },
-    //   (error, result) => {
-    //     if (error) {
-    //       return console.log("Unable to insert user!");
-    //     }
+    // Insert a single document
+    const insertResult = await db.collection("users").insertOne({
+      name: "Parv",
+      age: 18,
+    });
 
-    //     console.log(result.ops);
-    //   }
-    // );
+    console.log("Inserted single document:", insertResult.ops);
 
-    db.collection("users").insertMany(
-      [
-        {
-          name: "Jen",
-          age: 18,
-        },
-        {
-          name: "Parv",
-          age: 18,
-        },
-      ],
-      (error, result) => {
-        if (error) {
-          return console.log("Unable to insert documents!");
-        }
+    // Insert multiple documents
+    const insertManyResult = await db.collection("users").insertMany([
+      {
+        name: "Jen",
+        age: 19,
+      },
+      {
+        name: "Parv",
+        age: 18,
+      },
+    ]);
 
-        console.log(result.ops);
-      }
-    );
+    console.log("Inserted multiple documents:", insertManyResult.ops);
+  } catch (error) {
+    console.error("Unable to connect to database:", error);
+  } finally {
+    // Ensure the client is properly closed
+    await client.close();
   }
-);
+}
 
-// view
+// Call the function to connect to the database and perform CRUD operations
+connectToDatabase();
