@@ -1,80 +1,43 @@
-// Crud Operations
-const { MongoClient } = require("mongodb-legacy");
+// CRUD create read update delete
+
+const { MongoClient, ObjectID } = require("mongodb");
 
 const connectionURL = "mongodb://127.0.0.1:27017";
-const databaseName = "task-app";
+const databaseName = "task-manager";
 
-async function connectToDatabase() {
-  const client = new MongoClient(connectionURL, { useNewUrlParser: true });
-
-  try {
-    // Connect to the MongoDB server
-    await client.connect();
-    console.log("Connected!!!!!");
+MongoClient.connect(
+  connectionURL,
+  { useNewUrlParser: true },
+  (error, client) => {
+    if (error) {
+      return console.log("Unable to connect to database!");
+    }
 
     const db = client.db(databaseName);
 
-    // Insert a single document
-    const insertResult = await db.collection("users").insertOne({
-      name: "Parv",
-      age: 18,
-    });
+    // db.collection('users').findOne({ _id: new ObjectID("5c1113239cbfe605241f9071") }, (error, user) => {
+    //     if (error) {
+    //         return console.log('Unable to fetch')
+    //     }
 
-    console.log("Inserted single document:", insertResult.insertedId);
+    //     console.log(user)
+    // })
 
-    // Insert multiple documents
-    const insertManyResult = await db.collection("users").insertMany([
-      {
-        name: "Jen",
-        age: 19,
-      },
-      {
-        name: "Parv",
-        age: 18,
-      },
-    ]);
+    // db.collection('users').find({ age: 27 }).toArray((error, users) => {
+    //     console.log(users)
+    // })
 
-    console.log("Inserted multiple documents:", insertManyResult.insertedIds);
-
-    //
-    //
-    //
-    //
-    db.collection("tasks").insertMany(
-      [
-        {
-          description: "clean the house",
-          complete: true,
-        },
-        {
-          description: "renew the description",
-          complete: false,
-        },
-        {
-          description: "water the plants",
-          complete: true,
-        },
-      ],
-      (error, result) => {
-        if (error) {
-          return console.log("unable to insert task!");
-        }
-        console.log(tasksInsertResult.insertedIds);
+    db.collection("tasks").findOne(
+      { _id: new ObjectID("5c0fec243ef6bdfbe1d62e2f") },
+      (error, task) => {
+        console.log(task);
       }
     );
 
-    //
-    //
-    //
-    //
-    // /
-  } catch (error) {
-    console.error("Unable to connect to database:", error);
-  } finally {
-    // Ensure the client is properly closed
-    await client.close();
+    db.collection("tasks")
+      .find({ completed: false })
+      .toArray((error, tasks) => {
+        console.log(tasks);
+      });
   }
-}
-
-// Call the function to connect to the database and perform CRUD operations
-connectToDatabase();
+);
